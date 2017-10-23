@@ -65,59 +65,66 @@ while function_value > 1E-8:
 
 	gradient = eval_grad(x_k)
 
-	grad_norm = np.linalg.norm(eval_grad(x_k)) #returns the norm of the gradient at x_k 
+	evaluated_hessian = eval_hessian(x_k)
 
-	p_k = (-1.0) * (gradient / grad_norm) 
+	p_k = (-1) * (np.linalg.inv(evaluated_hessian.astype(np.float64))).dot(gradient) #Take the inverse of the evaluated hessian typecasted to float
+
+	#grad_norm = np.linalg.norm(eval_grad(x_k)) #returns the norm of the gradient at x_k 
+
+	#p_k = (-1.0) * (gradient / grad_norm) 
 
 	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Begin picking step length~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
 	
 	def zoom(alpha_low, alpha_high):
 
 		'''Zoom function that exists per iteration'''
+		return (alpha_high + alpha_low)/2.0 
+		
+		# while True: 
 
+		# # 	#Try quadratic interpolation first
 
-		while True: 
-
-		# 	#Try quadratic interpolation first
-
-		 	#alpha_quad = -alpha_high**2 * dphi_0/ 2*(phi(alpha_high) - phi(alpha_low) - alpha_high*dphi_0) 
-		# 	print("alpha_low = {}, alpha_high = {}, alpha_quad = {}".format(alpha_low,alpha_high,alpha_quad))
-
+		#  	alpha_quad = -(alpha_high**2 * dphi_0)/ (2*(phi(alpha_high) - phi(alpha_low) - alpha_high*dphi_0))
+		 	
+		# 	print("alpha_quad = {}".format(alpha_quad))
 
 		# 	if phi(alpha_quad) <= phi_0 + c1 * alpha_quad * dphi_0: #Armijo Condition is unsatisfied from quad interp, d0 cubic
-
-		# 		#cubic interpolation. Right now the subscripts are still alpha_1 and alpha_2, will change once I know quad works
+		# # 	#cubic interpolation. Right now the subscripts are still alpha_quad and alpha_2, will change once I know quad works
 		# 		print("Quad didn't work, doing cubic")
 
-		# 		denom = alpha_0**2 * alpha_1**2 * (alpha_1 - alpha_0)
-		# 		ar1 = np.array([[alpha_0**2, - alpha_1**2],[-alpha_0**3, alpha_1**3]]) #2x2 array
-		# 		ar2 = np.array([[phi(alpha_1) - phi(0) - alpha_1 * dphi(0)],[phi(alpha_0) - phi(0) - alpha_0 * dphi(0)]]) #2x1 vector 
+		#  		denom = alpha_high**2 * alpha_quad**2 * (alpha_quad - alpha_high)
+		#  		ar1 = np.array([[alpha_high**2, - alpha_quad**2],[-alpha_high**3, alpha_quad**3]]) #2x2 array
+		#  		ar2 = np.array([[phi(alpha_quad) - phi(0) - alpha_quad * dphi(0)],[phi(alpha_high) - phi(0) - alpha_high * dphi(0)]]) #2x1 vector 
 
-		# 		a,b = (1 / denom )*  np.dot(ar1,ar2) #solve linear system, get a and b coefficients 
+		#  		a,b = (1 / denom )*  np.dot(ar1,ar2) #solve linear system, get a and b coefficients 
 
-		# 		alpha_cube = (-b + np.sqrt(b**2 - 3 * a * dphi(0)))/(3*a) #get cubic result
+		#  		alpha_cube = (-b + np.sqrt(b**2 - 3 * a * dphi(0)))/(3*a) #get cubic result
 
-			alpha_interp =  ((alpha_low + alpha_high)/2.0)
+		#  		print("alpha_cube = {}".format(alpha_cube))
 
-			alpha_j = alpha_interp #Finished interpolating, set this to quad or cubic
+		# 	if alpha_cube > 0:
 
-			if (phi(alpha_j) > phi_0 + c1*alpha_j*dphi_0) or (phi(alpha_j) >= phi(alpha_low)): #line 4 of zoom
+		# 		alpha_j = alpha_cube
+		# 	else: 
+		# 		alpha_j = alpha_quad #Finished interpolating, set this to quad or cubic
 
-				alpha_high = alpha_j
+		# 	if (phi(alpha_j) > phi_0 + c1*alpha_j*dphi_0) or (phi(alpha_j) >= phi(alpha_low)): #line 4 of zoom
 
-			else: 
+		# 		alpha_high = alpha_j
 
-				if abs(dphi(alpha_j)) <= -c2*dphi_0: 
+		# 	else: 
 
-					alpha_star = alpha_j
+		# 		if abs(dphi(alpha_j)) <= -c2*dphi_0: 
 
-		 			return alpha_star
+		# 			alpha_star = alpha_j
 
-		 		if dphi(alpha_j)*(alpha_high - alpha_low) >= 0: 
+		#  			return alpha_star
 
-					alpha_high = alpha_low
+		#  		if dphi(alpha_j)*(alpha_high - alpha_low) >= 0: 
 
-				alpha_low = alpha_j
+		# 			alpha_high = alpha_low
+
+		# 		alpha_low = alpha_j
 	
 	phi_list = [] #book keeping 
 	alpha_list = []
@@ -154,7 +161,7 @@ while function_value > 1E-8:
 
 		if (phi_i > phi_0 + c1*alpha*dphi_0) or (phi_i >= phi_list[i-1] and i > 0):
 
-				print("phi_i = {}, phi_0 = {}, alpha = {}, dphi_0 = {}".format(phi_i,phi_0,alpha,dphi_0))
+				#print("phi_i = {}, phi_0 = {}, alpha = {}, dphi_0 = {}".format(phi_i,phi_0,alpha,dphi_0))
 
 				print("alpha_list[i-1] = {}, alpha = {}".format(alpha_list[i-1],alpha))
 

@@ -54,16 +54,21 @@ def eval_hessian(x_k):
 x_k_list = []
 f_list = [] 
 
-x_k = (1.2,1.2)
+x_k = (-1.0,1.2)
 function_value = eval_function(x_k)
 
 f_list.append(function_value)
 
 l = 0 
 
+#for r in range(5):
 while function_value > 1E-8:
 
 	gradient = eval_grad(x_k)
+
+	#evaluated_hessian = eval_hessian(x_k)
+
+	#p_k = (-1) * (np.linalg.inv(evaluated_hessian.astype(np.float64))).dot(gradient) #Take the inverse of the evaluated hessian typecasted to float
 
 	grad_norm = np.linalg.norm(eval_grad(x_k)) #returns the norm of the gradient at x_k 
 
@@ -71,35 +76,62 @@ while function_value > 1E-8:
 
 	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Begin picking step length~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
 	
+	phi_list = [] #book keeping 
+	alpha_list = []
+
+	alpha_high = 0
+	alpha_list.append(alpha_high)
+	alpha_quad = 1
+	alpha_max = 5 
+
+	c1 = 1E-4
+	c2 = 0.9 
+	
+	i = 1
+
+	phi = lambda alpha: f(x_k[0] + alpha*p_k[0],x_k[1] + alpha*p_k[1]) #phi as a function of alpha, at the current x_k and p_k. Eval with phi(alpha)
+
+	dphi = lambda alpha: np.dot(p_k, eval_grad(x_k + alpha * p_k)) #The derivative of phi. Eval with dphi(alpha)
+
+	dphi_0 = dphi(0)
+
+	phi_0 = phi(0)
+
+	alpha = alpha_quad
+
 	def zoom(alpha_low, alpha_high):
 
 		'''Zoom function that exists per iteration'''
 
+		alpha_cube = 0 
 
 		while True: 
 
 		# 	#Try quadratic interpolation first
 
-		 	#alpha_quad = -alpha_high**2 * dphi_0/ 2*(phi(alpha_high) - phi(alpha_low) - alpha_high*dphi_0) 
-		# 	print("alpha_low = {}, alpha_high = {}, alpha_quad = {}".format(alpha_low,alpha_high,alpha_quad))
+		 	alpha_quad = -(alpha_high**2 * dphi_0)/ (2*(phi(alpha_high) - phi(alpha_low) - alpha_high*dphi_0))	
+		
+			if phi(alpha_quad) <= phi_0 + c1 * alpha_quad * dphi_0: #Armijo Condition is unsatisfied from quad interp, d0 cubic
+		# 	#cubic interpolation. Right now the subscripts are still alpha_quad and alpha_2, will change once I know quad works
+				print("Quad didn't work, doing cubic")
 
+		 		denom = alpha_high**2 * alpha_quad**2 * (alpha_quad - alpha_high)
+		 		ar1 = np.array([[alpha_high**2, - alpha_quad**2],[-alpha_high**3, alpha_quad**3]]) #2x2 array
+		 		ar2 = np.array([[phi(alpha_quad) - phi(0) - alpha_quad * dphi(0)],[phi(alpha_high) - phi(0) - alpha_high * dphi(0)]]) #2x1 vector 
 
-		# 	if phi(alpha_quad) <= phi_0 + c1 * alpha_quad * dphi_0: #Armijo Condition is unsatisfied from quad interp, d0 cubic
+		 		a,b = (1 / denom )*  np.dot(ar1,ar2) #solve linear system, get a and b coefficients 
 
-		# 		#cubic interpolation. Right now the subscripts are still alpha_1 and alpha_2, will change once I know quad works
-		# 		print("Quad didn't work, doing cubic")
+		 		alpha_cube = (-b + np.sqrt(b**2 - 3 * a * dphi(0)))/(3*a) #get cubic result
 
-		# 		denom = alpha_0**2 * alpha_1**2 * (alpha_1 - alpha_0)
-		# 		ar1 = np.array([[alpha_0**2, - alpha_1**2],[-alpha_0**3, alpha_1**3]]) #2x2 array
-		# 		ar2 = np.array([[phi(alpha_1) - phi(0) - alpha_1 * dphi(0)],[phi(alpha_0) - phi(0) - alpha_0 * dphi(0)]]) #2x1 vector 
+		 		print("alpha_cube = {}".format(alpha_cube))
 
-		# 		a,b = (1 / denom )*  np.dot(ar1,ar2) #solve linear system, get a and b coefficients 
+			if alpha_cube > 0:
 
-		# 		alpha_cube = (-b + np.sqrt(b**2 - 3 * a * dphi(0)))/(3*a) #get cubic result
+				alpha_j = alpha_cube
 
-			alpha_interp =  ((alpha_low + alpha_high)/2.0)
+			else: 
 
-			alpha_j = alpha_interp #Finished interpolating, set this to quad or cubic
+				alpha_j = alpha_quad #Finished interpolating, set this to quad or cubic
 
 			if (phi(alpha_j) > phi_0 + c1*alpha_j*dphi_0) or (phi(alpha_j) >= phi(alpha_low)): #line 4 of zoom
 
@@ -119,28 +151,7 @@ while function_value > 1E-8:
 
 				alpha_low = alpha_j
 	
-	phi_list = [] #book keeping 
-	alpha_list = []
-
-	alpha_0 = 0
-	alpha_list.append(alpha_0)
-	alpha_1 = 1
-	alpha_max = 5 
-
-	c1 = 1E-4
-	c2 = 0.9 
 	
-	i = 1
-
-	phi = lambda alpha: f(x_k[0] + alpha*p_k[0],x_k[1] + alpha*p_k[1]) #phi as a function of alpha, at the current x_k and p_k. Eval with phi(alpha)
-
-	dphi = lambda alpha: np.dot(p_k, eval_grad(x_k + alpha * p_k)) #The derivative of phi. Eval with dphi(alpha)
-
-	dphi_0 = dphi(0)
-
-	phi_0 = phi(0)
-
-	alpha = alpha_1
 
 	while True:
 			
@@ -153,8 +164,6 @@ while function_value > 1E-8:
 		phi_list.append(phi_i)
 
 		if (phi_i > phi_0 + c1*alpha*dphi_0) or (phi_i >= phi_list[i-1] and i > 0):
-
-				print("phi_i = {}, phi_0 = {}, alpha = {}, dphi_0 = {}".format(phi_i,phi_0,alpha,dphi_0))
 
 				print("alpha_list[i-1] = {}, alpha = {}".format(alpha_list[i-1],alpha))
 
@@ -188,7 +197,7 @@ while function_value > 1E-8:
 
 	function_value = eval_function(x_k) #regaining current value of the function for logging purposes
 
-	print("alpha_k = {}, x_k = {}, function_value = {}, p_k = {}".format(alpha_k,x_k,function_value,p_k)) #Correct order of things 
+	#print("alpha_k = {}, x_k = {}, function_value = {}, p_k = {}".format(alpha_k,x_k,function_value,p_k)) #Correct order of things 
 	x_k_list.append(x_k)
 	f_list.append(function_value)
 	alpha_list.append(alpha)

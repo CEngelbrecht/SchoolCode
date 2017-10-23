@@ -16,7 +16,6 @@ grad_f = [sp.diff(f,x1),sp.diff(f,x2)] #Symbolic representation of the gradient
 hessian = np.array([[sp.diff(sp.diff(f,x1),x1),sp.diff(sp.diff(f,x1),x2)], \
 					[sp.diff(sp.diff(f,x2),x1),sp.diff(sp.diff(f,x2),x2)]])
 
-
 def eval_grad(x_k):
 	'''Takes in two points, and evaluates the predefined symbolic represetation of the gradient at those points
 		and returns the subsequent tuple'''
