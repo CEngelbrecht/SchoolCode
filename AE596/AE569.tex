@@ -1,0 +1,103 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\begin{document}
+
+\title{Final Project AE 569\\\large IGM Guidance algorithm}
+
+\author{Christian Engelbrecht}
+
+
+\maketitle
+
+\newpage
+\section{Equations of motion; K1, K2}
+
+For a given set of final states of an ascent vehicle leaving the lunar surface, we can write the equations of motion simply as:\newline
+\begin{align*}
+\dot{x} &= V_x \\ 
+\dot{y} &= V_y \\ 
+\dot{V_x} &= a\cos{\beta} \\ 
+\dot{V_y} &= -g + a\sin{\beta} \\ 
+\end{align*}
+
+Where $\beta$ is the flight angle of the vehicle, and
+
+\begin{equation*} %putting the * in there makes it not be numberes 
+a = \frac{T}{m(t)} = \frac{T}{m_0 - \dot{m}(t - t_0)}
+\end{equation*}
+
+is the thrust acceleration of the vehicle,for a given thrust $T$.The vehicle ascends from some time 0 to a final time $t_f$, where the final condition of the vehicle is 
+
+\begin{align*}
+V_x(t_f) &= V_x^* \\
+V_y(t_f) &= V_y^* \\
+y(t_f) &= y_f^*
+\end{align*}
+
+Using optimal control theory, we now aim to maximize the Hamiltonian $H$ of the system. The Hamiltonian is 
+
+\begin{equation*}
+H = P_x V_x + P_yV_y + P_{V_{x}} a\cos(\beta) + P_{V_{y}}(-g +a\sin(\beta))
+\end{equation*}
+
+Where $\boldsymbol{P_r}$ is $\binom{P_x}{P_y}$ , and $\boldsymbol{P_V}$ is $\binom{P_{V_{x}}}{P_{V_{y}}}$ are the costate vectors for 
+position and velocity, respectively. \newline
+We also define a performance index $J$ that will minimize the total flight time 
+
+\begin{equation*}
+J = t_f
+\end{equation*}
+
+The derivatives for the costate equations are 
+
+\begin{align*}
+\dot{P_x}-\frac{\partial H}{\partial x} &= 0 & \dot{P_y}-\frac{\partial H}{\partial y} &= 0 \\
+\Rightarrow P_x &= c_1 & \Rightarrow P_y &= c_2\\
+\dot{P_{V_{x}}} = -\frac{\partial H}{\partial V_{x}} &= -P_{x}  & \dot{P_{V_{y}}}-\frac{\partial H}{\partial V_{y}} &= -P_{y} \\
+\Rightarrow P_{V_{x}} &= c_1t +c3 & \Rightarrow P_{V_{y}} &= c_2t +c4
+\end{align*}
+
+Our control variable here is $\beta$, and since this is not a constrained control ($\beta$ can take on any value), the optimility condtition 
+$\frac{\partial H}{\partial \beta} = 0$ gives us an expression to relate $\beta$ to the constants found above: 
+
+\begin{align*}
+\frac{\partial H}{\partial \beta} =  (\frac{T}{M}) (-P_{V_{x}} \sin\beta + P_{V_{y}}\cos\beta) &= 0 \\
+\Rightarrow -P_{V_{x}} \sin\beta + P_{V_{y}}\cos\beta &= 0 \\
+P_{V_{x}} tan\beta - P_{V_{y}} &= 0 \\
+\tan\beta &= \frac{P_{V_{y}}}{P_{V_{x}}} \\ 
+\tan\beta &= \frac{c_2 t + c_4}{c_1 t + c_3}																
+\end{align*}
+
+This is the familiar bilinear tangent law. We can now use the transversaility conditions to trim down the number of unknowns. The transversality
+condition for $P_{V_{x}}$ is	
+
+\begin{align*}
+P_x (t_f) = -\frac{\partial \Phi }{\partial x(t_f)} = -\frac{\partial t_f }{x(t_f)} &= 0 \\
+\Rightarrow P_x = c_1 &= 0 
+\end{align*}
+
+Similarly, the transversality condition for $P_y$: 
+
+\begin{align*}
+P_y (t_f) = -\frac{\partial \Phi }{\partial y(t_f)} = -\frac{\partial t_f }{y(t_f)} &= 0 \\
+\Rightarrow P_y = c_2 &= 0 \\
+\Aboxed{\therefore\tan\beta &= \frac{c_4}{c_3} = constant \equiv \tan\tilde{\chi}}
+\end{align*}
+
+We can now integrate the equations of motion to find explicit closed form solutions for $V_x, V_y, x,y$. Integrating $V_x and V_y$: 
+
+\begin{align*}
+V_x(t) &= \cos{\beta}\int_{t_0}^{t} \frac{Td\tau}{m-\dot{m}(t_0 - \tau)} \\
+&= T\cos{\beta} \cdot \frac{\ln (m_0 + \dot{m}(t_0 - \tau)}{\dot{m}}\Big|_{\tau = t_0}^{\tau = t} \\
+&= -g_0I_{sp}\cos\beta \cdot [\ln(m_0 + \dot{m}(t_0 + t)) - \ln(m_0)] \\
+&= g_0I_{sp}\ln\left(\frac{m_0}{m_0 + \dot{m}(t_0 + t)}\right)
+
+V_y(t) &= 
+\end{align*}
+
+
+
+\end{document}	
