@@ -28,4 +28,13 @@ def eval_hessian(x_k):
 
 	return np.array([[h1,h2],[h3,h4]])
 
+delta = 0.025
+x = np.arange(-5.0, 5.0, delta)
+y = np.arange(-5.0, 5.0, delta)
+X, Y = np.meshgrid(x, y)
 
+Z = 10*(Y - X**2)**2 + (1 - X)**2
+
+plt.figure()
+cp = plt.contour(X, Y, Z)
+plt.show()
