@@ -79,7 +79,7 @@ P_x (t_f) = -\frac{\partial \Phi }{\partial x(t_f)} = -\frac{\partial t_f }{x(t_
 \Rightarrow P_x = c_1 &= 0 
 \end{align*}
 
-Similarly, the transversality condition for $P_y$: 
+Similarly, the transversality condition for $P_y$, in a simplified situation where $y(t_f)$ is not specified:
 
 \begin{align*}
 P_y (t_f) = -\frac{\partial \Phi }{\partial y(t_f)} = -\frac{\partial t_f }{y(t_f)} &= 0 \\
@@ -87,17 +87,43 @@ P_y (t_f) = -\frac{\partial \Phi }{\partial y(t_f)} = -\frac{\partial t_f }{y(t_
 \Aboxed{\therefore\tan\beta &= \frac{c_4}{c_3} = constant \equiv \tan\tilde{\chi}}
 \end{align*}
 
-We can now integrate the equations of motion to find explicit closed form solutions for $V_x, V_y, x,y$. Integrating $V_x and V_y$: 
+We can now integrate the equations of motion to find explicit closed form solutions for $V_x, V_y, x,y$. Integrating $V_x$ and $V_y$, recalling $\dot{m} = -\frac{T}{g_0 I_{sp}}$: 
 
 \begin{align*}
-V_x(t) &= \cos{\beta}\int_{t_0}^{t} \frac{Td\tau}{m-\dot{m}(t_0 - \tau)} \\
-&= T\cos{\beta} \cdot \frac{\ln (m_0 + \dot{m}(t_0 - \tau)}{\dot{m}}\Big|_{\tau = t_0}^{\tau = t} \\
-&= -g_0I_{sp}\cos\beta \cdot [\ln(m_0 + \dot{m}(t_0 + t)) - \ln(m_0)] \\
-&= g_0I_{sp}\ln\left(\frac{m_0}{m_0 + \dot{m}(t_0 + t)}\right)
-
-V_y(t) &= 
+V_x(t) &= \cos{\beta}\int_{t_0}^{t} \frac{Td\tau}{m-\dot{m}(t_0 - \tau)}\notag \\
+&= T\cos{\beta} \cdot \frac{\ln (m_0 + \dot{m}(t_0 - \tau)}{\dot{m}}\Big|_{\tau = t_0}^{\tau = t}\notag \\
+&= -g_0I_{sp}\cos\beta \cdot [\ln(m_0 + \dot{m}(t_0 + t)) - \ln(m_0)] + V_x(t_0)\notag \\
+&= g_0I_{sp}\cos\beta\ln\left(\frac{m_0}{m_0 + \dot{m}(t_0 + t)}\right) + V_x(t_0)
 \end{align*}
 
+\begin{align*}
+V_y(t) &= \sin{\beta}\int_{t_0}^{t} \frac{Td\tau}{m-\dot{m}(t_0 - \tau)} + \int_{t_0}^{t} gd\tau\notag\\
+&= T\sin{\beta} \left (\frac{\ln (m_0 + \dot{m}(t_0 - \tau)}{\dot{m}}\Big|_{\tau = t_0}^{\tau = t}  + g\tau\Big|_{\tau = t_0}^{\tau = t} \right )\notag \\
+&= -g_0I_{sp}\sin\beta  [\ln(m_0 + \dot{m}(t_0 + t)) - \ln(m_0) + g(t - t_0)] + V_y(t_0)\notag \\
+&= g_0I_{sp}\sin\beta\ln\left(\frac{m_0}{m_0 + \dot{m}(t_0 + t)}\right)  - g(t - t_0)+ V_y(t_0)
+\end{align*}
 
+We now use the end conditions $V_x(t_f) = V_x^*$ and $V_y(t_f) = V_y^*$. We define the temporary variable $\gamma \equiv g_0I_{sp}\ln\left(\frac{m_0}{m_0 + \dot{m}(t_0 + t)}\right)$
+
+\begin{align}
+\Rightarrow V_y^* + g(t_f - t_0) - V_y(t_0) &= \gamma\sin\tilde\chi \\
+V_x^* - V_x(t_0) & = \gamma\cos\tilde\chi
+\end{align}
+
+Then divide $(1)$ by $(2)$: 
+
+\begin{equation}
+\Rightarrow \tan\tilde\chi = \frac{V_y^* - V_y(t_0) + g(t_f - t_0)}{V_x^* - V_x(t_0)}
+\label{eq:three}
+\end{equation}
+
+This equation now only depends on $t_f - t_0$, which is called the Time to Go: $t_{go}$. We will use this equation to determine the value for $\tilde\chi$ given a value for 
+$t_{go}$ \newline
+We now consider again the linear tangent law, with the full constraint on final vertical position (i.e. the transversality condition for $P_y$ does not apply), the bilinear 
+tangent law is now the linear tangent law, where the constants $c_2, c_3 $ and $c_4$ are recast to $k1,k_0$. We consider the tangenet law not at a specific time $t$ but at 
+
+\begin{equation}
+\tan\beta = k_1()
+\end{equation}
 
 \end{document}	
