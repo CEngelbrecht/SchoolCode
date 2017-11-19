@@ -1,23 +1,15 @@
 import numpy as np 
 from rosenbrock_2Nd_translated import rosenbrock
 
-x_0 = rosenbrock(0,-1) #first argument doesn't matter, -1 return the initial conditions 
+alpha_list = [] 
+function_value = []
+inner_counter = 0 
+outer_counter = 0 
 
-H_0 = np.identity(len(x_0))
-	
-epsilon = 1E-8
 
-x_k = x_0
-H_k = H_0
-
-grad = rosenbrock(x_k,1)
-
-I = np.identity(len(x_k))
-
-#while np.linalg.norm(grad) > 1E-8: 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def linesearch(p_k,x_k): 
+def linesearch(p_k,x_k, grad): 
 
 	alpha_bar = 1
 	rho = 0.5
@@ -25,24 +17,46 @@ def linesearch(p_k,x_k):
 
 	alpha = alpha_bar
 
-	test_val1 = rosenbrock((x_k + (alpha * p_k)),0)
-	print test_val1
+	test_val1 = rosenbrock((x_k + (alpha * p_k)),0) #function evaluated at x_k + alpha * p_k 
 
-	while rosenbrock((x_k + alpha * p_k),0) > rosenbrock(x_k,0) + c * alpha * np.dot(np.transpose(p_k),rosenbrock(x_k,1)): 
+	test_val2 = rosenbrock(x_k,0) + (c * alpha * np.transpose(p_k).dot(grad))
 
+	while test_val1 > test_val2: 
+		
 		alpha = rho * alpha
+
+		test_val1 = rosenbrock((x_k + (alpha * p_k)),0)
+
+		test_val2 = rosenbrock(x_k,0) + (c * alpha * np.transpose(p_k).dot(grad))
+
+		print test_val2,test_val1, alpha
 
 	return alpha
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-for i in range(1):
+x_0 = rosenbrock(0,-1) #first argument doesn't matter, -1 return the initial conditions 
 
-	p_k = np.dot(H_k,grad)
+H_0 = np.identity(len(x_0))
+	
+epsilon = 1E-8 #threshold 
 
-	alpha_k = linesearch(p_k,x_k)
+x_k = x_0 #initial conditions 
+H_k = H_0 
 
-	x_kplusone = x_k + alpha_k * p_k
+grad = rosenbrock(x_k,1)
+
+I = np.identity(len(x_k)) #Initial guess to the inverse Hessian
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+while np.linalg.norm(grad) > epsilon: 
+
+	p_k = np.dot(-H_k,grad)
+
+	alpha_k = linesearch(p_k,x_k,grad) #return step length
+
+	x_kplusone = x_k + alpha_k * p_k #take step in p_k direction 
 
 	s_k = x_kplusone - x_k
 
@@ -50,7 +64,7 @@ for i in range(1):
 
 	rho_k = 1.0/np.dot(np.transpose(y_k),s_k)
 
-	H_kplusone = (I - rho_k * np.dot(s_k,np.transpose(y_k))) * H_k * (I - rho_k * np.dot(y_k,np.transpose(s_k))) + rho_k * np.dot(s_k,np.transpose(s_k))
+	H_kplusone = (I - rho_k * np.dot(s_k,np.transpose(y_k))) * H_k * (I - rho_k * np.dot(y_k,np.transpose(s_k))) + rho_k * np.dot(s_k,np.transpose(s_k)) #BFGS update
 
 	H_k = H_kplusone
 
@@ -58,3 +72,8 @@ for i in range(1):
 
 	grad = rosenbrock(x_k,1)
 
+
+
+print "Done!"
+
+print x_k
