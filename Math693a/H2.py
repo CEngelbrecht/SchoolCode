@@ -134,7 +134,7 @@ while function_value > 1E-8:
 
 	phi = lambda alpha: f(x_k[0] + alpha*p_k[0],x_k[1] + alpha*p_k[1]) #phi as a function of alpha, at the current x_k and p_k. Eval with phi(alpha)
 
-	dphi = lambda alpha: np.dot(p_k, eval_grad(x_k + alpha * p_k)) #The derivative of phi. Eval with dphi(alpha)
+	dphi = lambda alpha: np.dot(np.transpose(p_k), eval_grad(x_k + alpha * p_k)) #The derivative of phi. Eval with dphi(alpha)
 
 	dphi_0 = dphi(0)
 
