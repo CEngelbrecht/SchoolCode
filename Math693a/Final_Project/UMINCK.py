@@ -1,4 +1,4 @@
-def UMINCK (n,machineps,x_0):
+def UMINCK (n,machineps,x_0,*typx,*typx):
 	'''Checks values of algorithmic options and tolerances'''
 
 	termcode = 0 

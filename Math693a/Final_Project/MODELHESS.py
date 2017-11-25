@@ -1,4 +1,5 @@
 def MODELHESS(n,machineps, H_c): 
+	'''Need a function description'''
 
 	import numpy as np
 	from CHOLDECOMP import CHOLDECOMP
@@ -8,6 +9,7 @@ def MODELHESS(n,machineps, H_c):
 	maxdiag = max([H_c[i][i] for i in range(len(H_c))])
 	mindiag = min([H_c[i][i] for i in range(len(H_c))])
 	maxposdiag = max(0,maxdiag)
+	
 	if mindiag <= sqrteps * maxposdiag: 
 
 		mu = 2.0 * (maxposdiag - mindiag) * sqrteps - mindiag
@@ -49,7 +51,21 @@ def MODELHESS(n,machineps, H_c):
 	#11 
 	maxoffl = np.sqrt(max(maxdiag,(maxoff/n)))
 
-	L = CHOLDECOMP(n, H_c, maxoffl, machineps) #just does numpy cholesky 
+	#12
+	L,maxadd = CHOLDECOMP(n, H_c, maxoffl, machineps) #just does numpy cholesky factorization
+
+	#13
+
+	if maxadd > 0: 
+		#do this later
+		pass
+
+	#13.8
+
+	L, maxadd = CHOLDECOMP(n, H_c, 0, machineps)
+
+	return L 
+
 
 
 
