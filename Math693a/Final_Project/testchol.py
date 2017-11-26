@@ -1,33 +1,21 @@
-import numpy as np 
+from numpy.linalg import cholesky
+from numpy import array
+from HESS import HESS 
+from MACHINEPS import MACHINEPS
+from MODELHESS import MODELHESS
 
-A = np.array([[4,12,-16],[12,37,-43],[-16,-43,98]])
+machineps = MACHINEPS()
 
-L = np.zeros(A.shape)
+n = 4
+x_0 = array([[1.2],[1.2],[1.2],[1.2]])
 
-n = 3 
+H_c = HESS(n,x_0)
 
-for j in range(len(A)):
+L = MODELHESS(n,machineps,H_c)
 
-	L[j][j] = A[j][j] - sum([L[j][i]**2 for i in range(0,j)])
-	
-	minljj = 0 
-	
-	for i in range(j+1,n):
+H_c = HESS(n,x_0)
 
-		L[i][j] = A[j][i] - sum([L[i][k] * L[j][k] for k in range(0,(j - 1))])
-		
-		minljj = max(abs(L[i][j]),minljj)
-		
-	if L[j][j] > minljj**2:
-		
-		L[j][j] = np.sqrt(L[j][j])
-	
-	for i in range(j+1,n):
-	
-		L[i][j] = L[i][j]/L[j][j]
-	
-
-print L
-		
-
-
+cholesky_for_realsky = cholesky(H_c)
+print H_c
+print L 
+print cholesky_for_realsky

@@ -1,19 +1,21 @@
 def MODELHESS(n,machineps, H_c): 
-	'''Need a function description'''
+	'''Find mu necessary to make H + mu*I safely positive definite, and calculate Cholesky Decomposition of LLT of H'''
 
-	import numpy as np
+	from numpy import sqrt
 	from CHOLDECOMP import CHOLDECOMP
 
-	sqrteps = np.sqrt(machineps)
+	sqrteps = sqrt(machineps)
 
-	maxdiag = max([H_c[i][i] for i in range(len(H_c))])
-	mindiag = min([H_c[i][i] for i in range(len(H_c))])
+	maxdiag = max([H_c[i][i] for i in range(0,n)])
+	mindiag = min([H_c[i][i] for i in range(0,n)])
 	maxposdiag = max(0,maxdiag)
 	
 	if mindiag <= sqrteps * maxposdiag: 
 
 		mu = 2.0 * (maxposdiag - mindiag) * sqrteps - mindiag
 		maxdiag = maxdiag + mu
+
+		print("mu = {}".format(mu))
 
 	else: 
 
@@ -22,13 +24,13 @@ def MODELHESS(n,machineps, H_c):
 	#finding max off diagonal
 	maxoff = 0
 
-	for i in range(len(H_c)):
-		for j in range(len(H_c)):
-			if i == j:
+	for i in range(0,n):
+		for j in range(0,n):
+			if i == j: #don't look at the diagonal elements 
 				pass
 			else: 
 				if abs(H_c[i][j]) > maxoff: 
-					maxoff = abs(H_c[i][j])
+					maxoff = abs(H_c[i][j]) #assign new value to maxoff
 
 	if maxoff * (1.0 + 2.0*sqrteps) > maxdiag: 
 
@@ -44,28 +46,30 @@ def MODELHESS(n,machineps, H_c):
 	#10
 	if mu > 0: 
 
-		for i in range(len(H_c)):
+		for i in range(0,n):
 
-			H_c[i][i] += mu
+			H_c[i][i] += mu #add mu to every element 
 
 	#11 
-	maxoffl = np.sqrt(max(maxdiag,(maxoff/n)))
+	maxoffl = sqrt(max(maxdiag,(maxoff/n)))
 
 	#12
+	#print("Calling CHOLDECOMP from MODELHESS")
 	L,maxadd = CHOLDECOMP(n, H_c, maxoffl, machineps) #just does numpy cholesky factorization
 
 	#13
 
 	if maxadd > 0: 
 		#do this later
+		print("Maxadd > 0")
+		L, maxadd = CHOLDECOMP(n, H_c, 0, machineps)
 		pass
 
 	#13.8
 
-	L, maxadd = CHOLDECOMP(n, H_c, 0, machineps)
+		
 
 	return L 
-
 
 
 

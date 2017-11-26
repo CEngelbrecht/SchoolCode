@@ -1,6 +1,7 @@
 def LINESEARCH(n,x_c,f_c,g_c,p, maxstep,steptol): 
 
 	from rosenbrock_2Nd_translated import rosenbrock
+	from numpy import dot,sqrt,transpose
 
 	maxtaken = False
 
@@ -16,7 +17,7 @@ def LINESEARCH(n,x_c,f_c,g_c,p, maxstep,steptol):
 
 		Newtlen = maxstep
 
-	initslope = np.dot(np.transpose(g_c),p)
+	initslope = dot(transpose(g_c),p) #gTranspose * p *
 
 	rellength = max([(abs(p[i]))/(x_c[i]) for i in range(0,n)])
 
@@ -48,7 +49,7 @@ def LINESEARCH(n,x_c,f_c,g_c,p, maxstep,steptol):
 
 				Right_Vector = np.array([[float(f_plus  - f_c - Lambda*initslope)],[float(f_plusprev - f_c - lambdaPrev*initslope)]])
 				Left_Matrix = np.array([[(1.0/(Lambda**2)),-1.0/(lambdaPrev**2)],[-lambdaPrev/Lambda**2, Lambda/(lambdaPrev**2)]])
-				a,b = (1.0/(Lambda - lambdaPrev)) * np.dot(Left_Matrix,Right_Vector)
+				a,b = (1.0/(Lambda - lambdaPrev)) * dot(Left_Matrix,Right_Vector)
 				a,b = float(a),float(b) #extracts floats from the returned 1x1 arrays 
 
 				disc = float(b**2 - 3* a * initslope)

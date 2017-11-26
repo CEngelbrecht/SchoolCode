@@ -5,11 +5,11 @@ def UMSTOP(n,x_c,x_plus,f,g,typf,retcode,gradtol,steptol,itncount,itnlimit,maxta
 
 	if retcode == 1: 
 		termcode = 3
-
-	elif (max([float(abs(g_0[i]) * abs(x_0[i])/max(abs(f),typf)) for i in range(0,n)])) <= gradtol: 
+	#2b
+	elif (max([float(abs(g[i]) * abs(x_plus[i])/max(abs(f),typf)) for i in range(0,n)])) <= gradtol: 
 		termcode = 1
-
-	elif max([float((x_plus[i] - x_0[i]) / x_plus[i]) for i in range(0,n)]) <= steptol: 
+	#2c
+	elif max([float((x_plus[i] - x_c[i]) / x_plus[i]) for i in range(0,n)]) <= steptol: 
 
 		termcode = 2 
 
@@ -28,6 +28,6 @@ def UMSTOP(n,x_c,x_plus,f,g,typf,retcode,gradtol,steptol,itncount,itnlimit,maxta
 
 		consecmax = 0
 
-	print("termcode = {}".format(termcode))
+	#print("termcode = {} from UMSTOP".format(termcode))
 
 	return termcode
