@@ -72,7 +72,8 @@ def LS_Strong_Wolfe(p_k,x_k,grad):
 
 		while True:
 
-			#
+			#making a cubic Hermite polynomial every time; not going through quadratic and 
+
 			d1 = dphi(alpha_low) + dphi(alpha_high) - 3 * ((phi(alpha_low) - phi(alpha_high))/(alpha_low - alpha_high))
 			d2 = np.sign(alpha_high - alpha_low) * np.sqrt(d1**2 - dphi(alpha_low) * dphi(alpha_high))
 
@@ -155,6 +156,7 @@ def BFGS(algo):
 	function_values = []
 	grad_norm_list = []
 	criteria_list = []
+	curvature_list = []
 	inner_counter = 0
 	outer_counter = 1.0
 	function_values.append(rosenbrock(x_k,0))
@@ -175,9 +177,6 @@ def BFGS(algo):
 			alpha_k,temp_inner = backtracking_search(p_k,x_k,grad) #return step length, and inner counter
 		elif algo == 'LS_Strong_Wolfe':
 			alpha_k,temp_inner = LS_Strong_Wolfe(p_k,x_k,grad)
-
-		print("Alpha = {}".format(alpha_k))
-
 
 		x_kplusone = x_k + alpha_k * p_k #take step in p_k direction 
 
@@ -210,6 +209,7 @@ def BFGS(algo):
 		function_values.append(rosenbrock(x_k,0))
 		outer_counter += 1
 		inner_counter += temp_inner
+		curvature_list.append(np.dot(np.transpose(s_k),y_k))
 		#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 		assert np.dot(np.transpose(s_k),y_k) > 0, "Curvature condition failed!"
@@ -229,6 +229,11 @@ def BFGS(algo):
 	plt.legend(loc = 'upper right')
 	plt.xlabel("Iteration number")
 	plt.title('BFGS {} Linesearch Results \n Outer Iterations: {} Inner Iterations: {}'.format(algo,outer_counter, inner_counter))
+	plt.figure()
+	curvature_list = [i[0][0] for i in curvature_list]
+	plt.semilogy(curvature_list)
+	plt.title("Curvature condition  "+r"$s_{k}^Ty_k$" +" for " +str(algo))
+	plt.xlabel("Iteration number")
 	plt.show()
 
 #						End Definition for BFGS function

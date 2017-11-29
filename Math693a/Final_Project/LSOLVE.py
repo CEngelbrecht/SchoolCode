@@ -10,7 +10,7 @@ def LSOLVE(n,b,L):
 
 	for i in range(1,n):
 
-		y[i] = (b[i] - sum([L[i][j] * y[j] for j in range(1,i-1)]))/L[i][i]
+		y[i] = (b[i] - sum([L[i][j] * y[j] for j in range(1,i)]))/L[i][i]
 
 	return y 
 

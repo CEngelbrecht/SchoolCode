@@ -1,7 +1,7 @@
 def LINESEARCH(n,x_c,f_c,g_c,p, maxstep,steptol): 
 
 	from rosenbrock_2Nd_translated import rosenbrock
-	from numpy import dot,sqrt,transpose
+	from numpy import dot,sqrt,transpose,array
 
 	maxtaken = False
 
@@ -47,8 +47,8 @@ def LINESEARCH(n,x_c,f_c,g_c,p, maxstep,steptol):
 
 			else: 
 
-				Right_Vector = np.array([[float(f_plus  - f_c - Lambda*initslope)],[float(f_plusprev - f_c - lambdaPrev*initslope)]])
-				Left_Matrix = np.array([[(1.0/(Lambda**2)),-1.0/(lambdaPrev**2)],[-lambdaPrev/Lambda**2, Lambda/(lambdaPrev**2)]])
+				Right_Vector = array([[float(f_plus  - f_c - Lambda*initslope)],[float(f_plusprev - f_c - lambdaPrev*initslope)]])
+				Left_Matrix = array([[(1.0/(Lambda**2)),-1.0/(lambdaPrev**2)],[-lambdaPrev/(Lambda)**2, Lambda/(lambdaPrev**2)]])
 				a,b = (1.0/(Lambda - lambdaPrev)) * dot(Left_Matrix,Right_Vector)
 				a,b = float(a),float(b) #extracts floats from the returned 1x1 arrays 
 
@@ -58,7 +58,7 @@ def LINESEARCH(n,x_c,f_c,g_c,p, maxstep,steptol):
 					lambdaTemp = -1.0 * initslope/(2 * b)
 
 				else: 
-					lambdaTemp = (-b + np.sqrt(disc))/(3.0 * a)
+					lambdaTemp = (-b + sqrt(disc))/(3.0 * a)
 
 				if lambdaTemp > 0.5*Lambda:
 					lambdaTemp = 0.5*Lambda

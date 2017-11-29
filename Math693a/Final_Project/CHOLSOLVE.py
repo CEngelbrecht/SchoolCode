@@ -9,7 +9,7 @@ def CHOLSOLVE(n,g_c,L_c):
 	s = LTSOLVE(n,s,L_c)
 
 	s = -1*s
-	print("CHOLSOLVE returning s = {}".format(s))
+
 	return s 
 	
 

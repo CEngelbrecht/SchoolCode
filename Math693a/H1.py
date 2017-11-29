@@ -126,6 +126,4 @@ while function_value > 1E-8:
 
 plt.semilogy(range(len(f_list)),f_list,'o-',c = 'black')
 plt.grid()
-plt.
-
 plt.show()

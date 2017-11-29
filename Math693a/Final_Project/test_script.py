@@ -19,6 +19,7 @@ factsec = False
 cheapf = False 
 fdigits = -1 
 typf = 1 
+plot_results = True
 
 machineps = MACHINEPS()
 
@@ -29,7 +30,7 @@ itnlimit = 15000
 delta = -1.0
 
 x_f,termcode = UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf, \
-						factsec,gradtol,steptol,maxstep,itnlimit,typf = typf,delta = delta)
+						factsec,gradtol,steptol,maxstep,itnlimit,typf = typf,delta = delta,plot_results = plot_results)
 
 print "UMDRIVER terminated with  x_f = {}".format(x_f)
 
@@ -38,13 +39,13 @@ if termcode  == 1:
 elif termcode == 2: 
 	print("termcode = 2. Scaled distance between last two steps less than steptol, x_plus may be an approximate local minimizer of fx), but it is also possible that the algorithm is making very slow progress and is not near a minimizer. Or,steptol is too large ")
 elif termcode == 3: 
-	print("last global step failed to locate a lower point than x_c. Either x_c is an approximate local minimizer and no more \
+	print("termcode = 3. Last global step failed to locate a lower point than x_c. Either x_c is an approximate local minimizer and no more \
 accuracy is possible, or an innacurately coded analytic gradient is being used, or the finite difference approximation \
 is too innacurate, or steptol is too large")
 elif termcode == 4: 
-	print("Iteration limit exceeded")
+	print("Termcode = 4. Iteration limit exceeded")
 elif termcode == 5: 
-	print("five consecutive steps of length maxstep have been taken: either f(x) is unbounded below, or f(x) has\
+	print("Termcode = 5. Five consecutive steps of length maxstep have been taken: either f(x) is unbounded below, or f(x) has\
 a finite asymptote in some direction, or maxstep is too small")
 else: 
 	print("Not a recognized termcode")

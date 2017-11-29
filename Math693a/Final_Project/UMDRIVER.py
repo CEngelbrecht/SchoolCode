@@ -15,11 +15,26 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 	from MACHINEPS import MACHINEPS
 	from UMSTOP import UMSTOP
 	from UMINCK import UMINCK
+	from PLOTTER import PLOTTER
 
 	print("UMDRIVER called with kwargs {}".format(kwargs))
 
+	#assign kwargs if passed on from calling function
 	if 'typf' in kwargs:
 		typf = kwargs['typf']
+	if 'plot_results' in kwargs:
+		plot_results = kwargs['plot_results']
+
+
+	#				Book keeping 
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	x_list = []
+	f_list = []
+	g_list = []
+	s_list = []
+
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	#				Start initialization
 	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,10 +83,18 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 
 	x_c = x_0 
 	H_0 = H_c
+						#Book keeping
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	x_list.append(x_c)
+	g_list.append(g_c)
+	f_list.append(f_c)
+
+	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 						#Done initializing, start iterating 
 	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	while termcode == 0: 
+	while termcode == 0:
 
 		print("UMDRIVER itncount = {}".format(itncount))
 		itncount += 1 
@@ -82,7 +105,7 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 		s_N = CHOLSOLVE(n, g_c, L_c)
 
 		if globalstrat == 1: #do linesearch 	
-			print("linsearch called with x_c = {}, s_N = {}".format(x_c,s_N))
+			#print("linsearch called with x_c = {}, s_N = {}".format(x_c,s_N))
 			retcode,x_plus,f_plus,maxtaken = LINESEARCH(n,x_c,f_c,g_c,s_N,maxstep,steptol) # 0 retcode = found good x_plus 
 
 		elif globalstrat == 2: #do hookdriver 
@@ -135,5 +158,19 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 			x_c = x_plus
 			f_c = f_plus
 			g_c = g_plus
+
+			#~~~~~~~~~~~Bookkeeping~~~~~~~~~~~~~~~~
+			x_list.append(x_c)
+			g_list.append(g_c)
+			f_list.append(f_c)
+			s_list.append(s_N)
+
+			#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	if plot_results:
+		PLOTTER(f_list,tag = 'function')
+		if plot_results and n == 2:
+			print s_list
+			PLOTTER(s_list,tag = 'direction')
 
 	return x_f,termcode
