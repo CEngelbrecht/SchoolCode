@@ -170,7 +170,6 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 	if plot_results:
 		PLOTTER(f_list,tag = 'function')
 		if plot_results and n == 2:
-			print s_list
 			PLOTTER(s_list,tag = 'direction')
 
 	return x_f,termcode
