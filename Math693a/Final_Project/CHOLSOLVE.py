@@ -10,7 +10,7 @@ def CHOLSOLVE(n,g_c,L_c):
 
 	s = -1.0*s
 
-	print("s as returned by CHOLSOLVE: {}".format(s))
+	#print("s as returned by CHOLSOLVE: {}".format(s))
 	return s 
 	
 

@@ -1,8 +1,8 @@
-def FN_powell(n,x_c): 
+def FN_Powell(n,x_c): 
 
 	from Powell_function import Powell_function
 
-	x_c = Powell_function(x_k,0)
+	x_c = Powell_function(x_c,0)
 
 	return x_c
 

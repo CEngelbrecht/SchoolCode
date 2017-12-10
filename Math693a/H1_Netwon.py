@@ -5,7 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt 
 import sympy as sp 
 
-x_0 = [-1.2,1.0]
+x_0 = [1.2,1.2]
 
 x1,x2,f = sp.symbols('x1,x2,f')
 

@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.11.12)  7 DEC 2017 15:11
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.11.12)  7 DEC 2017 17:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**AE569.tex
-(/home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.tex
+**AE596.tex
+(/home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.tex
 LaTeX2e <2016/02/01>
 Babel <3.9q> and hyphenation patterns for 81 language(s) loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -156,8 +156,8 @@ Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 \Gin@req@height=\dimen121
 \Gin@req@width=\dimen122
 )
-(/home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.aux)
-\openout1 = `AE569.aux'.
+(/home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.aux)
+\openout1 = `AE596.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 11.
 LaTeX Font Info:    ... okay on input line 11.
@@ -360,7 +360,7 @@ ng used on input line 303.
 s/Christian_School/Plots/M2_BetavT.png>] [14 </home/rp/Documents/Christian_Scho
 ol/Plots/M2_Yvt.png> </home/rp/Documents/Christian_School/Plots/M2_Vvt.png>] [1
 5 </home/rp/Documents/Christian_School/Plots/M2_gammavt.png>]
-(/home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.aux) ) 
+(/home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.aux) ) 
 Here is how much of TeX's memory you used:
  3003 strings out of 493029
  43947 string characters out of 6136233
@@ -385,8 +385,8 @@ re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/tex
 live/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/share/texlive/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on /home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.pd
-f (15 pages, 373837 bytes).
+Output written on /home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.pd
+f (15 pages, 380793 bytes).
 PDF statistics:
  138 PDF objects out of 1000 (max. 8388607)
  84 compressed objects within 1 object stream

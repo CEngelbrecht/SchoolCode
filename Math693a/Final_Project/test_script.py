@@ -1,16 +1,15 @@
 import numpy as np
 from UMDRIVER import UMDRIVER
 from MACHINEPS import MACHINEPS
-from FN import FN 
-from GRAD import GRAD
-from HESS import HESS 
+from Powell_Driver import FN_Powell as FN
+from Powell_Driver import GRAD_Powell as GRAD
+from Powell_Driver import HESS_Powell as HESS
 
 '''Watch out for pass by reference https://www.tutorialspoint.com/python/python_functions.htm '''
 
-x_0 = (1.2,1.2) #inital starting tuple
+x_0 = (-1.2,1.0,-1.2,1.0) #inital starting tuple
 x_0 = np.reshape(np.array(x_0),(len(x_0),1)) #numpy array of (x_0)T
 n = len(x_0)
-
 
 globalstrat = 1 
 analgrad = True

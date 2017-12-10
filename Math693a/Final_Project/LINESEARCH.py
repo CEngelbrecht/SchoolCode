@@ -43,12 +43,12 @@ def LINESEARCH(n,x_c,f_c,g_c,p, maxstep,steptol):
 		else: 
 
 			if Lambda == 1.0: 
-				lambdaTemp = -initslope/(2 * f_plus - f_c - initslope)
+				lambdaTemp = -initslope/(2 * (f_plus - f_c - initslope))
 
 			else: 
 
 				Right_Vector = array([[float(f_plus  - f_c - Lambda*initslope)],[float(f_plusprev - f_c - lambdaPrev*initslope)]])
-				Left_Matrix = array([[(1.0/(Lambda**2)),-1.0/(lambdaPrev**2)],[-lambdaPrev/(Lambda)**2, Lambda/(lambdaPrev**2)]])
+				Left_Matrix = array([[(1.0/(Lambda**2)),-1.0/(lambdaPrev**2)],[-lambdaPrev/(Lambda**2), Lambda/(lambdaPrev**2)]])
 				a,b = (1.0/(Lambda - lambdaPrev)) * dot(Left_Matrix,Right_Vector)
 				a,b = float(a),float(b) #extracts floats from the returned 1x1 arrays 
 

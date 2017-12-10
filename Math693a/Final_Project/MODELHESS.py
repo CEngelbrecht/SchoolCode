@@ -3,6 +3,7 @@ def MODELHESS(n,machineps, H_c):
 
 	from numpy import sqrt
 	from CHOLDECOMP import CHOLDECOMP
+	from numpy.linalg import cholesky 
 
 	sqrteps = sqrt(machineps)
 
@@ -55,8 +56,9 @@ def MODELHESS(n,machineps, H_c):
 
 	#12
 	#print("Calling CHOLDECOMP from MODELHESS")
-	L,maxadd = CHOLDECOMP(n, H_c, maxoffl, machineps) #just does numpy cholesky factorization
-
+	#L,maxadd = CHOLDECOMP(n, H_c, maxoffl, machineps) #does cholesky factorization 
+	L = cholesky(H_c) #DOING NUMPY's CHOLESKY DOES EXACTLY THE SAME AS CHOLDECOMP 12/6/2017
+	maxadd = 0 
 	#13
 
 	if maxadd > 0: 
@@ -67,10 +69,4 @@ def MODELHESS(n,machineps, H_c):
 
 	#13.8
 
-		
-
 	return L 
-
-
-
-

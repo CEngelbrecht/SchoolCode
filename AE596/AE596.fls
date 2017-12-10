@@ -3,8 +3,8 @@ INPUT /etc/texmf/web2c/texmf.cnf
 INPUT /usr/share/texmf/web2c/texmf.cnf
 INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.tex
-OUTPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.log
+INPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.tex
+OUTPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.log
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
@@ -45,9 +45,9 @@ INPUT /usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty
 INPUT /usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty
 INPUT /usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
 INPUT /usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
-INPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.aux
-INPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.aux
-OUTPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.aux
+INPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.aux
+INPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.aux
+OUTPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.aux
 INPUT /usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 INPUT /usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 INPUT /usr/share/texlive/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
@@ -94,7 +94,7 @@ INPUT /usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
-OUTPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.pdf
+OUTPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.pdf
 INPUT /var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmr12.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
@@ -145,7 +145,7 @@ INPUT /home/rp/Documents/Christian_School/Plots/M2_Vvt.png
 INPUT /home/rp/Documents/Christian_School/Plots/M2_gammavt.png
 INPUT /home/rp/Documents/Christian_School/Plots/M2_gammavt.png
 INPUT /home/rp/Documents/Christian_School/Plots/M2_gammavt.png
-INPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE569.aux
+INPUT /home/rp/Documents/Christian_School/SchoolCode/AE596/AE596.aux
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb

@@ -16,6 +16,7 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 	from UMSTOP import UMSTOP
 	from UMINCK import UMINCK
 	from PLOTTER import PLOTTER
+	from H1_Newton_Rev2 import H1_backtracking_and_fplus
 
 	print("UMDRIVER called with kwargs {}".format(kwargs))
 
@@ -100,14 +101,14 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 		itncount += 1 
 
 		if not factsec:
-			L_c = MODELHESS(n,machineps,H_c) #returns 
+			L_c = MODELHESS(n,machineps,H_c) #returns model hessian's lower triangular parts(?)
 
-		s_N = CHOLSOLVE(n, g_c, L_c)
+		s_N = CHOLSOLVE(n, g_c, L_c) #S is search direction 
 
 		if globalstrat == 1: #do linesearch 	
 			#print("linsearch called with x_c = {}, s_N = {}".format(x_c,s_N))
 			retcode,x_plus,f_plus,maxtaken = LINESEARCH(n,x_c,f_c,g_c,s_N,maxstep,steptol) # 0 retcode = found good x_plus 
-
+			#retcode,x_plus,f_plus,maxtaken = H1_backtracking_and_fplus(n,x_c,f_c,g_c,s_N)
 		elif globalstrat == 2: #do hookdriver 
 			pass
 		elif globalstrat ==3: #do dogdriver
@@ -169,7 +170,9 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 
 	if plot_results:
 		PLOTTER(f_list,tag = 'function')
-		if plot_results and n == 2:
-			PLOTTER(s_list,tag = 'direction')
+		PLOTTER(g_list,tag = 'gradient')
+	if plot_results and n == 2:
+		#print('y')
+		PLOTTER(x_list,tag = 'direction')
 
 	return x_f,termcode
