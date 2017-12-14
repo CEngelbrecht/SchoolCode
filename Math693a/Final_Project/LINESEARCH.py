@@ -1,4 +1,4 @@
-def LINESEARCH(n,x_c,f_c,g_c,p, maxstep,steptol): 
+def LINESEARCH(n,x_c,f_c,FN,g_c,p, maxstep,steptol): 
 
 	from rosenbrock_2Nd_translated import rosenbrock
 	from numpy import dot,sqrt,transpose,array
@@ -28,7 +28,7 @@ def LINESEARCH(n,x_c,f_c,g_c,p, maxstep,steptol):
 	while retcode >= 2: 
 
 		x_plus = x_c + Lambda * p
-		f_plus = rosenbrock(x_plus,0) #evaluates rosenbrock at x_plus 
+		f_plus = FN(n,x_plus) #evaluates function at x_plus 
 
 		if f_plus <= f_c + alpha * Lambda * initslope:  #satisfactory x_plus 
 			retcode = 0

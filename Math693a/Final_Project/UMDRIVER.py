@@ -16,15 +16,24 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 	from UMSTOP import UMSTOP
 	from UMINCK import UMINCK
 	from PLOTTER import PLOTTER
-	from H1_Newton_Rev2 import H1_backtracking_and_fplus
+	from DOGDRIVER import DOGDRIVER 
+	from FDHESSG import FDHESSG
+	from FDGRAD import FDGRAD
+	from FDHESSF import FDHESSF
 
-	print("UMDRIVER called with kwargs {}".format(kwargs))
+	#print("UMDRIVER called with kwargs {}".format(kwargs))
 
 	#assign kwargs if passed on from calling function
 	if 'typf' in kwargs:
 		typf = kwargs['typf']
 	if 'plot_results' in kwargs:
 		plot_results = kwargs['plot_results']
+	if 'delta' in kwargs: 
+		delta = kwargs['delta']
+	if 'fdigits' in kwargs:
+		fdigits = kwargs['fdigits']
+
+
 
 
 	#				Book keeping 
@@ -34,13 +43,15 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 	f_list = []
 	g_list = []
 	s_list = []
+	delta_list = []
 
 	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	#				Start initialization
 	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	machineps = MACHINEPS()
-	termcode = UMINCK(n,machineps,x_0) #needs beefing up
+	termcode,eta = UMINCK(n,machineps,x_0,fdigits = fdigits) #needs beefing up
+	consecmax = 0.0
 
 	if termcode < 0: 
 
@@ -57,7 +68,7 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 		g_c = GRAD(n,x_0)
 
 	else: 
-		pass #call FDGRAD
+		g_c = FDGRAD(n,x_0,f_c,FN,eta)
 
 	#7
 	termcode = UMSTOP0(n,x_0,f_c,g_c,gradtol) 
@@ -67,14 +78,14 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 		sys.exit()
 
 	else: 
-		if analgrad == True: 
+		if analhess == True: 
 			H_c = HESS(n,x_0)
 
 		elif (analgrad and cheapf): 
-			pass 
+			H_c =  FDHESSG(n,x_0,g_c,GRAD,eta)
 
 		elif cheapf: 
-			pass 
+			H_c = FDHESSF(n,x_0,f_c,FN,eta)
 
 		elif factsec: 
 			pass 
@@ -97,22 +108,28 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 
 	while termcode == 0:
 
-		print("UMDRIVER itncount = {}".format(itncount))
+		print("UMDRIVER itncount = {}, x_c = \n{} g_c = \n{} H_c = \n{} ".format(itncount,x_c,g_c,H_c))
 		itncount += 1 
 
 		if not factsec:
-			L_c = MODELHESS(n,machineps,H_c) #returns model hessian's lower triangular parts(?)
+			H_c,L_c = MODELHESS(n,machineps,H_c) #returns model hessian's lower triangular parts(?)
 
-		s_N = CHOLSOLVE(n, g_c, L_c) #S is search direction 
+		s_N = CHOLSOLVE(n, g_c, L_c) #s_N is newton search direction  
 
-		if globalstrat == 1: #do linesearch 	
-			#print("linsearch called with x_c = {}, s_N = {}".format(x_c,s_N))
-			retcode,x_plus,f_plus,maxtaken = LINESEARCH(n,x_c,f_c,g_c,s_N,maxstep,steptol) # 0 retcode = found good x_plus 
-			#retcode,x_plus,f_plus,maxtaken = H1_backtracking_and_fplus(n,x_c,f_c,g_c,s_N)
-		elif globalstrat == 2: #do hookdriver 
+		if globalstrat == 1:
+			#do linesearch 
+			retcode,x_plus,f_plus,maxtaken = LINESEARCH(n,x_c,f_c,FN,g_c,s_N,maxstep,steptol) # 0 retcode = found good x_plus 
+
+		elif globalstrat == 2:
+			#do hookdriver 
+
 			pass
-		elif globalstrat ==3: #do dogdriver
-			pass 
+
+		elif globalstrat == 3:
+			#Call dogdriver 
+
+			delta,retcode,x_plus,f_plus,maxtaken = DOGDRIVER(n,x_c,f_c,FN,g_c,L_c,s_N,maxstep,steptol,delta)
+
 		else: 
 			#call linsearch mod 
 			pass 
@@ -126,9 +143,9 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 
 			else: 
 				#call FDGRAD
-				pass
+				g_plus = FDGRAD(n,x_c,f_c,FN,eta)
 		#10.6
-		termcode = UMSTOP(n,x_c,x_plus,f_plus,g_plus,typf,retcode,gradtol,steptol,itncount,itnlimit,maxtaken)
+		termcode,consecmax = UMSTOP(n,x_c,x_plus,f_plus,g_plus,typf,retcode,gradtol,steptol,itncount,itnlimit,maxtaken,consecmax)
 
 		if termcode > 0: 
 			#Found a final candidate
@@ -142,11 +159,12 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 
 			elif (analgrad == True and cheapf == True):
 				#call FDHESSG
-				pass 
+				H_c =  FDHESSG(n,x_c,g_c,GRAD,eta)
+				
 
 			elif cheapf == True:
 				#call FDHESSF
-				pass 
+				H_c = FDHESSF(n,x_plus,f_plus,FN,eta)
 
 			elif factsec == True:
 				#call BFGSFAC
@@ -165,14 +183,16 @@ def UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf,factsec,gra
 			g_list.append(g_c)
 			f_list.append(f_c)
 			s_list.append(s_N)
+			delta_list.append(delta)
 
 			#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	if plot_results:
-		PLOTTER(f_list,tag = 'function')
-		PLOTTER(g_list,tag = 'gradient')
-	if plot_results and n == 2:
-		#print('y')
-		PLOTTER(x_list,tag = 'direction')
+		PLOTTER(f_list,globalstrat = globalstrat, tag = 'function',)
+		PLOTTER(g_list,globalstrat = globalstrat,tag = 'gradient',)
+	if plot_results and n == 2 and globalstrat == 1 :
+		PLOTTER(x_list,globalstrat = globalstrat,tag = 'direction')
+	elif plot_results and n == 2 and globalstrat == 3: 
+		PLOTTER(x_list,globalstrat = globalstrat,tag = 'direction',delta_list =  delta_list)
 
-	return x_f,termcode
+	return x_f,termcode,delta_list

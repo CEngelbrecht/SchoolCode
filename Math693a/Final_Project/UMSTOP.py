@@ -1,4 +1,4 @@
-def UMSTOP(n,x_c,x_plus,f,g,typf,retcode,gradtol,steptol,itncount,itnlimit,maxtaken):
+def UMSTOP(n,x_c,x_plus,f,g,typf,retcode,gradtol,steptol,itncount,itnlimit,maxtaken,consecmax):
 
 
 	termcode = 0 
@@ -30,4 +30,4 @@ def UMSTOP(n,x_c,x_plus,f,g,typf,retcode,gradtol,steptol,itncount,itnlimit,maxta
 
 	#print("termcode = {} from UMSTOP".format(termcode))
 
-	return termcode
+	return termcode,consecmax

@@ -1,21 +1,52 @@
 import numpy as np
 from UMDRIVER import UMDRIVER
 from MACHINEPS import MACHINEPS
-from Powell_Driver import FN_Powell as FN
-from Powell_Driver import GRAD_Powell as GRAD
-from Powell_Driver import HESS_Powell as HESS
+import time
+import matplotlib.pyplot as plt  
 
-'''Watch out for pass by reference https://www.tutorialspoint.com/python/python_functions.htm '''
+function = "Rosenbrock"
 
-x_0 = (-1.2,1.0,-1.2,1.0) #inital starting tuple
-x_0 = np.reshape(np.array(x_0),(len(x_0),1)) #numpy array of (x_0)T
-n = len(x_0)
+if function == "Rosenbrock":
 
-globalstrat = 1 
+	from Rosenbrock_Driver import FN_rosenbrock as FN
+	from Rosenbrock_Driver import GRAD_rosenbrock as GRAD
+	from Rosenbrock_Driver import HESS_rosenbrock as HESS
+
+	n = 2
+
+	x_0 = np.zeros(n)
+
+	x_0 = np.reshape(x_0,(n,1))
+
+	for i in range(0,n,2):
+
+		x_0[i] = -1.2
+		x_0[i+1] = 1.0
+
+elif function == "Powell":
+
+	from Powell_Driver import FN_Powell as FN
+	from Powell_Driver import GRAD_Powell as GRAD
+	from Powell_Driver import HESS_Powell as HESS
+
+	n = 12
+
+	x_0 = np.zeros(n)
+
+	x_0 = np.reshape(x_0,(n,1))
+
+	for i in range(0,n,4):
+
+		x_0[i] = -3.0
+		x_0[i+1] = -1.0
+		x_0[i+2] = 0 	
+		x_0[i+3] = 1.0
+
+globalstrat = 1
 analgrad = True
 analhess = True
 factsec = False
-cheapf = False 
+cheapf = True 
 fdigits = -1 
 typf = 1 
 plot_results = True
@@ -24,14 +55,20 @@ machineps = MACHINEPS()
 
 gradtol = machineps**(1.0/3.0)
 steptol = machineps**(2.0/3.0)
-maxstep = 1E3
-itnlimit = 15000
-delta = -1.0
+maxstep = 10
+itnlimit = 100
+delta = 1.0
 
-x_f,termcode = UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf, \
-						factsec,gradtol,steptol,maxstep,itnlimit,typf = typf,delta = delta,plot_results = plot_results)
+time_start = time.time()
 
-print "UMDRIVER terminated with  x_f = {}".format(x_f)
+x_f,termcode,delta_list = UMDRIVER(n,x_0,FN,GRAD,HESS,globalstrat,analgrad,analhess,cheapf, \
+						factsec,gradtol,steptol,maxstep,itnlimit,typf = typf,delta = delta,plot_results = plot_results,\
+								fdigits = fdigits)
+time_end = time.time()
+
+#print("Time taken in {}".format(time_end - time_start))
+
+#print "UMDRIVER terminated with  x_f = {}".format(x_f)
 
 if termcode  == 1: 
 	print("termcode = 1. Norm of scaled gradient less than gradtol; x_plus probably is an approximate local minimizer of f(x)")
@@ -48,3 +85,13 @@ elif termcode == 5:
 a finite asymptote in some direction, or maxstep is too small")
 else: 
 	print("Not a recognized termcode")
+
+correct_x = np.zeros(n)
+
+correct_x = np.reshape(correct_x,(n,1))
+
+for i in range(len(correct_x)):
+	correct_x[i] = 0
+
+ave = np.average(abs(x_f - correct_x))
+print "{:.5E}".format(ave)

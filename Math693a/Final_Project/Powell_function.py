@@ -10,6 +10,7 @@ import numpy as np
 def Powell_function(x,order):
 
 	powell = lambda x: (x[0] + 10*x[1])**2 + 5*(x[2] - x[3])**2 + (x[1] - 2*x[2])**4 + 10*(x[0] - x[3])**4 
+	
 	powell_x0 = lambda x: 2*x[0] + 20*x[1] + 40*(x[0] - x[3])**3
 	powell_x1 = lambda x: 20*x[0] + 200*x[1] + 4*(x[1] - 2*x[2])**3
 	powell_x2 = lambda x: 10*x[2] - 10*x[3] - 8*(x[1] - 2*x[2])**3

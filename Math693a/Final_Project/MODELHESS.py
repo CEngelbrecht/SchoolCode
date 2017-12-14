@@ -45,28 +45,33 @@ def MODELHESS(n,machineps, H_c):
 		maxdiag = 1.0 
 
 	#10
-	if mu > 0: 
+	if mu > 0:
+
+		print("adding {} to H[i][i]".format(mu))
 
 		for i in range(0,n):
 
-			H_c[i][i] += mu #add mu to every element 
+			H_c[i][i] += mu #add mu to every diagnoal
 
 	#11 
 	maxoffl = sqrt(max(maxdiag,(maxoff/n)))
 
 	#12
-	#print("Calling CHOLDECOMP from MODELHESS")
-	#L,maxadd = CHOLDECOMP(n, H_c, maxoffl, machineps) #does cholesky factorization 
-	L = cholesky(H_c) #DOING NUMPY's CHOLESKY DOES EXACTLY THE SAME AS CHOLDECOMP 12/6/2017
+
+	L,maxadd = CHOLDECOMP(n, H_c, maxoffl, machineps) #does cholesky factorization 
+
 	maxadd = 0 
 	#13
 
 	if maxadd > 0: 
-		#do this later
+
 		print("Maxadd > 0")
 		L, maxadd = CHOLDECOMP(n, H_c, 0, machineps)
 		pass
 
 	#13.8
 
-	return L 
+	print H_c
+	print L
+
+	return H_c,L 
