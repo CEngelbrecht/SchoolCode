@@ -1,4 +1,4 @@
-def LTSOLVE(n,y,L):
+	def LTSOLVE(n,y,L):
 
 	from numpy import zeros
 

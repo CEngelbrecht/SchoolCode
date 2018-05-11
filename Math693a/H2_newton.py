@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import sympy as sp 
 import math 
+import time 
 
 x1,x2,f = sp.symbols('x1,x2,f')
 
@@ -53,91 +54,103 @@ def eval_hessian(x_k):
 
 x_k_list = []
 f_list = [] 
+alpha_list_outer = []
 
-x_k = (1.2,1.2)
+loc1 = (1.2,1.2)
+loc2 = (-1.2,1.0)
+loc = loc2
+#loc = loc1
+
+#Choosing location starting point 
+
+if loc == loc1:
+	x_0 = loc1
+elif loc == loc2:
+	x_0 = loc2
+x_k = x_0
+
 function_value = eval_function(x_k)
+
+gradient = eval_grad(x_k)
 
 f_list.append(function_value)
 
-l = 0 
 
-while function_value > 1E-8:
+while np.linalg.norm(gradient) > 1E-12:
 
 	gradient = eval_grad(x_k)
 
 	evaluated_hessian = eval_hessian(x_k)
 
-	p_k = (-1) * (np.linalg.inv(evaluated_hessian.astype(np.float64))).dot(gradient) #Take the inverse of the evaluated hessian typecasted to float
+	strat = "SD"
+	#strat = "Newton"
 
-	#grad_norm = np.linalg.norm(eval_grad(x_k)) #returns the norm of the gradient at x_k 
+	if strat == "Newton":
+		p_k = (-1) * (np.linalg.inv(evaluated_hessian.astype(np.float64))).dot(gradient) #Take the inverse of the evaluated hessian typecasted to float
+	elif strat == "SD":
+		grad_norm = np.linalg.norm(gradient) #returns the norm of the gradient at x_k 
+		p_k = (-1.0) * (gradient / grad_norm) 
 
-	#p_k = (-1.0) * (gradient / grad_norm) 
+	inner_counter = 0 
 
 	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Begin picking step length~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
-	
+
+	#~~~~~~~~~~~~~~~Begin define zoom~~~~~~~~~~~~~~~~	
 	def zoom(alpha_low, alpha_high):
+		alpha_list_zoom = []
+		j = 0 
+		e_1 = 1E-3
+		e_2 = e_1
 
+		counter = 0 
 		'''Zoom function that exists per iteration'''
-		return (alpha_high + alpha_low)/2.0 
 		
-		# while True: 
+		while True:
+			counter += 1 
+			
 
-		# # 	#Try quadratic interpolation first
+			#interpolate 
 
-		#  	alpha_quad = -(alpha_high**2 * dphi_0)/ (2*(phi(alpha_high) - phi(alpha_low) - alpha_high*dphi_0))
-		 	
-		# 	print("alpha_quad = {}".format(alpha_quad))
+			d1 = dphi(alpha_low) + dphi(alpha_high) - 3 * ((phi(alpha_low) - phi(alpha_high))/(alpha_low - alpha_high))
+			d2 = np.sign(alpha_high - alpha_low) * np.sqrt(d1**2 - dphi(alpha_low) * dphi(alpha_high))
 
-		# 	if phi(alpha_quad) <= phi_0 + c1 * alpha_quad * dphi_0: #Armijo Condition is unsatisfied from quad interp, d0 cubic
-		# # 	#cubic interpolation. Right now the subscripts are still alpha_quad and alpha_2, will change once I know quad works
-		# 		print("Quad didn't work, doing cubic")
+			alpha_j = alpha_high  - (alpha_high - alpha_low)* ((dphi(alpha_high) + d2 - d1)/(dphi(alpha_high) - dphi(alpha_low) + 2 * d2))
+			
+			alpha_list_zoom.append(alpha_j)	
 
-		#  		denom = alpha_high**2 * alpha_quad**2 * (alpha_quad - alpha_high)
-		#  		ar1 = np.array([[alpha_high**2, - alpha_quad**2],[-alpha_high**3, alpha_quad**3]]) #2x2 array
-		#  		ar2 = np.array([[phi(alpha_quad) - phi(0) - alpha_quad * dphi(0)],[phi(alpha_high) - phi(0) - alpha_high * dphi(0)]]) #2x1 vector 
+			if (phi(alpha_j) > phi(0) + c1*alpha_j*dphi_0) or (phi(alpha_j) >= phi(alpha_low)):
 
-		#  		a,b = (1 / denom )*  np.dot(ar1,ar2) #solve linear system, get a and b coefficients 
+				alpha_high = alpha_j
+			else: 
+				if abs(dphi(alpha_j)) <= -c2*dphi(0):
+					alpha_star = alpha_j
+					break
+				if dphi(alpha_j)*(alpha_high - alpha_low):
+					alpha_high = alpha_low
+				alpha_low = alpha_j 
 
-		#  		alpha_cube = (-b + np.sqrt(b**2 - 3 * a * dphi(0)))/(3*a) #get cubic result
-
-		#  		print("alpha_cube = {}".format(alpha_cube))
-
-		# 	if alpha_cube > 0:
-
-		# 		alpha_j = alpha_cube
-		# 	else: 
-		# 		alpha_j = alpha_quad #Finished interpolating, set this to quad or cubic
-
-		# 	if (phi(alpha_j) > phi_0 + c1*alpha_j*dphi_0) or (phi(alpha_j) >= phi(alpha_low)): #line 4 of zoom
-
-		# 		alpha_high = alpha_j
-
-		# 	else: 
-
-		# 		if abs(dphi(alpha_j)) <= -c2*dphi_0: 
-
-		# 			alpha_star = alpha_j
-
-		#  			return alpha_star
-
-		#  		if dphi(alpha_j)*(alpha_high - alpha_low) >= 0: 
-
-		# 			alpha_high = alpha_low
-
-		# 		alpha_low = alpha_j
+			#safeguards
+			if j > 0: 
 	
-	phi_list = [] #book keeping 
-	alpha_list = []
+				if abs(alpha_list_zoom[j] - alpha_list_zoom[j-1]) < e_1 or abs(alpha_list_zoom[j]) < e_2:
+					print "Triggered a safeguard"
+					alpha_star = alpha_list_zoom[j-1]/2.0  
+					break
+			j += 1
 
+		return alpha_star,alpha_list_zoom
+	#~~~~~~~~~~~~~~~End define zoom~~~~~~~~~~~~~~~~~~
+	 
+	alpha_list_inner = []
 	alpha_0 = 0
-	alpha_list.append(alpha_0)
+	alpha_list_inner.append(alpha_0)
 	alpha_1 = 1
 	alpha_max = 5 
 
 	c1 = 1E-4
 	c2 = 0.9 
 	
-	i = 1
+	i = 0
 
 	phi = lambda alpha: f(x_k[0] + alpha*p_k[0],x_k[1] + alpha*p_k[1]) #phi as a function of alpha, at the current x_k and p_k. Eval with phi(alpha)
 
@@ -150,61 +163,48 @@ while function_value > 1E-8:
 	alpha = alpha_1
 
 	while True:
+
+		inner_counter += 1 
 			
-		#print("i = {}".format(i))
+		alpha_list_inner.append(alpha) #book keeping
 
-		alpha_list.append(alpha) #book keeping
+		if i > 0:
 
-		phi_i = phi(alpha) #phi_i = phi(alpha_i)
-
-		phi_list.append(phi_i)
-
-		if (phi_i > phi_0 + c1*alpha*dphi_0) or (phi_i >= phi_list[i-1] and i > 0):
-
-				#print("phi_i = {}, phi_0 = {}, alpha = {}, dphi_0 = {}".format(phi_i,phi_0,alpha,dphi_0))
-
-				print("alpha_list[i-1] = {}, alpha = {}".format(alpha_list[i-1],alpha))
-
-				#zoom(alpha_low,alpha_high)				
-				alpha_star = zoom(alpha_list[i-1],alpha)
-				
-				print "Breaking with alpha_star = {}".format(alpha_star)
-				
+			if (phi(alpha_list_inner[i]) > (phi(0) + c1*alpha_list_inner[i])) or (phi(alpha_list_inner[i]) > phi(alpha_list_inner[i-1])):
+				alpha_star,alpha_list_zoom = zoom(alpha_list_inner[i-1],alpha_list_inner[i])
+								
 				break #should break out of the while True loop
 
-		if abs(dphi(alpha)) <= -c2*dphi_0: #line 7 of algorithm
+		if abs(dphi(alpha_list_inner[i])) <= -c2*dphi(0): #line 7 of algorithm
+			alpha_star = alpha_list_inner[i]
 
-				alpha_star = alpha
+			break #should break out of the while True loop
 
-				break #should break out of the while True loop
+		if (dphi(alpha_list_inner[i]) >= 0): #line 9 of algorithm
+			alpha_star,alpha_list_zoom = zoom(alpha_list_inner[i],alpha_list_inner[i-1])
 
-		if (dphi(alpha) >= 0 and i > 0): #line 9 of algorithm
+			break #should break out of the while True loop
 
-				alpha_star = zoom(alpha,alpha_list[i-1])
-
-				break #should break out of the while True loop
-
-		print('Increasing alpha')
-		alpha = abs(alpha_max - alpha)*0.2
-
-
+		alpha += abs(alpha_max - alpha)*0.2  #increasing alpha
 		i += 1 
+
+
+	
 	#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~End picking step length~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
 
 	alpha_k = alpha_star #This is the alpha to use for this step in the process
-
-	function_value = eval_function(x_k) #regaining current value of the function for logging purposes
-
-	print("alpha_k = {}, x_k = {}, function_value = {}, p_k = {}".format(alpha_k,x_k,function_value,p_k)) #Correct order of things 
-	x_k_list.append(x_k)
-	f_list.append(function_value)
-	alpha_list.append(alpha)
-
-	print alpha_k
 	
 	x_k = x_k + alpha_k*p_k
 
+	alpha_list_outer.append(alpha_k)
+	function_value = eval_function(x_k)
+	gradient = eval_grad(x_k)
 	x_k_list.append(x_k)
 	f_list.append(function_value)
+	
 
-	l+= 1 
+plt.semilogy(range(len(f_list)),f_list,'o-',c = 'black')
+plt.grid()
+plt.title(strat+" Strategy, H2 with Safeguards, x_0 = "+str(x_0))
+plt.ylabel("Objective Value")
+plt.show()

@@ -50,17 +50,23 @@ x_k_list = []
 function_value = eval_function(x_0) #inital value of the function
 
 f_list = []
+new_list = []
 #f_list.append(function_value)
 
 #Steepest descent method: 
+gradient = eval_grad(x_k)
 alpha_list = []
-while function_value > 1E-8:
+while np.sqrt(float(gradient[0]**2 + gradient[1]**2)) > 1E-12:
 	
 	gradient = eval_grad(x_k)
 
 	grad_norm = np.sqrt(float(gradient[0]**2 + gradient[1]**2))
 
-	p_k = (-1.0) * (gradient / grad_norm)
+	#p_k = (-1.0) * (gradient / grad_norm)
+
+	evaluated_hessian = eval_hessian(x_k)
+
+	p_k = (-1) * (np.linalg.inv(evaluated_hessian.astype(np.float64))).dot(gradient) #Take the inverse of the evaluated hessian typecasted to float
 
 	#~~~~~~~~Backtracking~~~~~~~~~~~~~~~~~#
 
@@ -69,11 +75,15 @@ while function_value > 1E-8:
 	c = 1E-4
 	alpha = alpha_bar
 
+	inner_counter = 0 
+
 	function_value = eval_function(x_k + p_k * alpha)
 
 	test_value = eval_function(x_k) + c * alpha * p_k.dot(gradient)
 
 	while function_value > test_value: 
+
+		inner_counter += 1 
 
 		alpha = rho * alpha
 
@@ -89,6 +99,8 @@ while function_value > 1E-8:
 	function_value = eval_function(x_k) #regaining current value of the function for logging purposes
 
 	print("alpha_k = {}, x_k = {}, function_value = {}, p_k = {}".format(alpha_k,x_k,function_value,p_k)) #Correct order of things 
+	print inner_counter
+	new_list.append(inner_counter)
 	x_k_list.append(x_k)
 	f_list.append(function_value)
 	alpha_list.append(alpha)
@@ -99,18 +111,18 @@ while function_value > 1E-8:
 	f_list.append(function_value)
 
 
-plt.subplot(121)
+#plt.subplot(121)
 plt.semilogy(range(len(f_list)),f_list,'o-',c = 'black')
 plt.grid()
 plt.xlabel('Iteration number')
 plt.ylabel('Objective Value')
 plt.title('Function Value vs Iteration')
-
-plt.subplot(122)
-plt.scatter(range(len(alpha_list)),alpha_list)
-plt.title('Step Size')
-plt.xlabel('Iteration Number')
-plt.ylabel('Step Size '+r'$\alpha$')
+print np.average(new_list)
+#plt.subplot(122)
+#plt.scatter(range(len(alpha_list)),alpha_list)
+#plt.title('Step Size')
+#plt.xlabel('Iteration Number')
+#plt.ylabel('Step Size '+r'$\alpha$')
 
 plt.suptitle('(-1.2,1.0) Rosenbrock Steepest Descent \n with Backtracking Line Search')
 

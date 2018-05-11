@@ -1,4 +1,4 @@
-import numpy as np 
+	d import numpy as np 
 
 def rosenbrock(x, order): 
 

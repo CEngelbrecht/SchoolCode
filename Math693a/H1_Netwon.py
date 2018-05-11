@@ -1,15 +1,16 @@
 import numpy as np 
+from numpy import sqrt
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt 
 import sympy as sp 
 
-x_0 = [1.2,1.2]
+x_0 = [-1.2,1.0]
 
 x1,x2,f = sp.symbols('x1,x2,f')
 
-f = 100* (x2 - x1**2)**2 + (1 - x1)**2#Symbolic representation of f(x1,x2)
+f = 10* (x2 - x1**2)**2 + (1 - x1)**2#Symbolic representation of f(x1,x2)
 
 grad_f = [sp.diff(f,x1),sp.diff(f,x2)] #Symbolic representation of the gradient 
 
@@ -53,7 +54,9 @@ f_list = []
 
 alpha_list = []
 
-while function_value > 1E-8:
+gradient = eval_grad(x_k)
+
+while np.sqrt(float(gradient[0]**2 + gradient[1]**2)) > 1E-12:
 	
 	gradient = eval_grad(x_k)
 
