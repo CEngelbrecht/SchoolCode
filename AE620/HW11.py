@@ -1,4 +1,4 @@
-from numpy import array,pi,deg2rad,sin,cos,dot,zeros,matmul
+from numpy import array,pi,deg2rad,sin,cos,dot,zeros,shape
 from numpy.linalg import inv,solve
 import matplotlib.pyplot as plt 
 
@@ -34,6 +34,7 @@ if __name__ == '__main__':
 	T = 5 
 	alpha = 5
 	alpha = deg2rad(alpha)
+	n = 4 
 
 	normal = array([sin(alpha),cos(alpha)])
 	Q_inf = (0.05 * c)/dt 
@@ -72,7 +73,7 @@ if __name__ == '__main__':
 
 
 	A[4][:] = 1.0 
-	gamma_foil0 = matmul(inv(A),B)
+	gamma_foil0 = solve(A,B)
 	gamma_sum = sum(gamma_foil0)
 	gamma_foil_list.append(gamma_sum)
 
@@ -82,7 +83,7 @@ if __name__ == '__main__':
 
 
 		
-	ITs = 0 #number of iterations 
+	ITs = 1 #number of iterations 
 	# wake_locs = zeros((ITs,2))
 	# #wake_locs[0] = [TE_loc[0] + 0.25*Q_inf*dt*cos(alpha),TE_loc[1] - 0.25*Q_inf*dt*sin(alpha)] #first wake location, 0.2
 
@@ -91,38 +92,33 @@ if __name__ == '__main__':
 	gamma_wake_list.append(gamma_wake)
 	wake_counter = 1 #introduce one wake vortex 
 
+	gamma_t = zeros((ITs+1,5))
+
+#~~~~~~~~~~~~~~~~~~~~~~~~MAIN LOOP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 	for k in range(ITs):
 
 		#loop over all collocation points 
-		for i in range(4): 
+		RHS = zeros(5)
 
-			wake_velocies = zeros((wake_counter,2))
-			RHS = zeros(5)
+		for i in range(n): 
+			#initialize arrays 
+			wake_velocities = zeros((wake_counter,2))
 			vel_tot = zeros((n,2))
 
 			for w in range(wake_counter):
 			#loop as many times as there are wake vortices and determine induced velocity from all the wakes on the i'th collocation point 
-				wake_velocites[w] = VOR2D(gamma_wake,x_colloc_locs[i],z_colloc_locs[i],vortex_x_locs[w+n],vortex_z_locs[w+n]) 
+				wake_velocities[w] = VOR2D(gamma_wake,x_colloc_locs[i],z_colloc_locs[i],vortex_x_locs[w+n],vortex_z_locs[w+n]) 
 
-			vel_tot[i] = (sum(wake_velocity[:][0],sum(wake_velocity[:][1]))
+			vel_tot[i] = (sum(wake_velocities[:,0],sum(wake_velocities[:,1]))) #sum of u's and w's 
+			RHS[i] = dot((-Q_inf*cos(alpha) + vel_tot[i][0],-Q_inf*sin(alpha) + vel_tot[i][1]),normal) #(U + u, W + w)*normal should give scalar
 
-			RHS[i] = dot((-Q_inf + vel_tot[i]),normal)
+		RHS[4] = sum(gamma_foil_list)
+		gamma_foil = solve(A,RHS)
+		gamma_t[wake_counter] = gamma_foil #be careful of off by 1 errors here 
+		
 
-		for i in range(4):
-
-			RHS[i] = dot([-Q_inf*sin(alpha) + wake_velocity[0],-Q_inf*cos(alpha) + wake_velocity[1]],n)
-
-		#RHS[4] should be sum of the four foil vortices
-
-		RHS[4] = gamma_foil_list[k]
-
-		gamma_j = solve(A,RHS)
-		gamma_j = sum(gamma_j)
-
-
-		wake_counter += 1 #add another wake vortex
-				#move collocation,vortex, LE and TE locations left by Q_inf*dt 
-
+		#move collocation,vortex, LE and TE locations left by Q_inf*dt 
 
 		x_colloc_locs = [i - Q_inf*sin(alpha)*dt for i in x_colloc_locs]
 		vortex_x_locs = [i - Q_inf*sin(alpha)*dt for i in vortex_x_locs]
@@ -134,6 +130,7 @@ if __name__ == '__main__':
 		vortex_x_locs.append(new_wake_loc[0])
 		vortex_z_locs.append(new_wake_loc[1])
 
+		wake_counter += 1 #add another wake vortex
 
 
 
