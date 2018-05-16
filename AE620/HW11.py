@@ -3,6 +3,9 @@ from numpy.linalg import inv,solve
 import matplotlib.pyplot as plt 
 
 def VOR2D(gamma,x,z,x_j,z_j):
+	'''
+	Calcualte velocity at x,z due to vortex of strength gamma located at x_j,z_j
+	'''
 
 	r_j = (x - x_j)**2 + (z - z_j)**2 
 	u = gamma*(z - z_j) / (2*pi*r_j**2)
@@ -10,7 +13,7 @@ def VOR2D(gamma,x,z,x_j,z_j):
 
 	return u,w
 	
-def plot(x_colloc_locs,z_colloc_locs,vortex_x_locs,vortex_z_locs,TE_loc,LE_loc,*wake_loc):	
+def plot(x_colloc_locs,z_colloc_locs,vortex_x_locs,vortex_z_locs,TE_loc,LE_loc,*wake_loc):
 
 	plt.plot(x_colloc_locs,z_colloc_locs,'g+',label = 'collation points')
 	plt.plot(vortex_x_locs,vortex_z_locs,'ro',label = 'lumped vortices')
@@ -32,15 +35,16 @@ if __name__ == '__main__':
 	alpha = 5
 	alpha = deg2rad(alpha)
 
-	n = array([sin(alpha),cos(alpha)])
+	normal = array([sin(alpha),cos(alpha)])
 	Q_inf = (0.05 * c)/dt 
 
-	x_colloc_locs = [i + 0.75*(c/4) for i in [0,0.25,0.5,0.75]]
+	x_colloc_locs = [i + cos(alpha)*0.75*(c/4) for i in [0,0.25,0.5,0.75]]
 	z_colloc_locs = [-i * sin(alpha) for i in x_colloc_locs]
-	vortex_x_locs = [i + 0.25*(c/4) for i in [0,0.25,0.5,0.75]]
+	vortex_x_locs = [i + cos(alpha)*0.25*(c/4) for i in [0,0.25,0.5,0.75]]
 	vortex_z_locs = [-i * sin(alpha) for i in vortex_x_locs]
 	LE_loc = [0,0]
 	TE_loc = [c*cos(alpha),-c*sin(alpha)]
+
 	wake_locs = [TE_loc[0] + 0.25*Q_inf*dt*cos(alpha),TE_loc[1] - 0.25*Q_inf*dt*sin(alpha)]
 
 	vortex_x_locs.append(wake_locs[0])
@@ -64,9 +68,8 @@ if __name__ == '__main__':
 
 			u,w = VOR2D(gamma,x_colloc_locs[i],z_colloc_locs[i],vortex_x_locs[j],vortex_z_locs[j])
 
-			A[i,j] = dot(array([u,w]), n)
+			A[i,j] = dot(array([u,w]), normal)
 
-			B[i] = -Q_inf*sin(alpha)
 
 	A[4][:] = 1.0 
 	gamma_foil0 = matmul(inv(A),B)
@@ -79,7 +82,7 @@ if __name__ == '__main__':
 
 
 		
-	ITs = 1 #number of iterations 
+	ITs = 0 #number of iterations 
 	# wake_locs = zeros((ITs,2))
 	# #wake_locs[0] = [TE_loc[0] + 0.25*Q_inf*dt*cos(alpha),TE_loc[1] - 0.25*Q_inf*dt*sin(alpha)] #first wake location, 0.2
 
@@ -87,13 +90,42 @@ if __name__ == '__main__':
 	gamma_wake_list = []
 	gamma_wake_list.append(gamma_wake)
 	wake_counter = 1 #introduce one wake vortex 
-	wake_velocity_list = [] 
 
 	for k in range(ITs):
 
-		#move collocation,vortex, LE and TE locations left by Q_inf*dt 
-		x_colloc_locs = [i - Q_inf*dt for i in x_colloc_locs]
-		vortex_x_locs = [i - Q_inf*dt for i in vortex_x_locs]
+		#loop over all collocation points 
+		for i in range(4): 
+
+			wake_velocies = zeros((wake_counter,2))
+			RHS = zeros(5)
+			vel_tot = zeros((n,2))
+
+			for w in range(wake_counter):
+			#loop as many times as there are wake vortices and determine induced velocity from all the wakes on the i'th collocation point 
+				wake_velocites[w] = VOR2D(gamma_wake,x_colloc_locs[i],z_colloc_locs[i],vortex_x_locs[w+n],vortex_z_locs[w+n]) 
+
+			vel_tot[i] = (sum(wake_velocity[:][0],sum(wake_velocity[:][1]))
+
+			RHS[i] = dot((-Q_inf + vel_tot[i]),normal)
+
+		for i in range(4):
+
+			RHS[i] = dot([-Q_inf*sin(alpha) + wake_velocity[0],-Q_inf*cos(alpha) + wake_velocity[1]],n)
+
+		#RHS[4] should be sum of the four foil vortices
+
+		RHS[4] = gamma_foil_list[k]
+
+		gamma_j = solve(A,RHS)
+		gamma_j = sum(gamma_j)
+
+
+		wake_counter += 1 #add another wake vortex
+				#move collocation,vortex, LE and TE locations left by Q_inf*dt 
+
+
+		x_colloc_locs = [i - Q_inf*sin(alpha)*dt for i in x_colloc_locs]
+		vortex_x_locs = [i - Q_inf*sin(alpha)*dt for i in vortex_x_locs]
 		LE_loc = [LE_loc[0] - Q_inf*dt,LE_loc[1]]
 		TE_loc = [TE_loc[0] - Q_inf*dt,TE_loc[1]]
 		
@@ -102,29 +134,7 @@ if __name__ == '__main__':
 		vortex_x_locs.append(new_wake_loc[0])
 		vortex_z_locs.append(new_wake_loc[1])
 
-		RHS = zeros(5) 
 
-		for w in range(wake_counter):
-			#loop as many times as there are wake vortices and determine induced velocity from the wakes 
-			wake_velocity_list.append(VOR2D(gamma_wake,x_colloc_locs[w],z_colloc_locs[w],vortex_x_locs[w],vortex_z_locs[w]))
-
-		wake_velocity = wake_velocity_list[k]
-
-		for i in range(4):
-
-			RHS[i] = dot([-Q_inf*sin(alpha) + wake_velocity[0],-Q_inf*cos(alpha) + wake_velocity[1]],n)
-
-		#RHS[4] should be sum of the four foil vortices
-		if k == 0: 
-			RHS[4] = gamma_foil0
-		else:
-			RHS[4] = gamma_foil_list[k-1]
-
-		gamma_j = solve(A,RHS)
-		gamma_j = sum(gamma_j)
-
-
-		wake_counter += 1 
 
 
 	plot(x_colloc_locs,z_colloc_locs,vortex_x_locs,vortex_z_locs,TE_loc,LE_loc) #plots latest location of airfoil, after all iterations 
